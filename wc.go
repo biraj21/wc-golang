@@ -11,11 +11,11 @@ import (
 )
 
 type Stats struct {
-	numLines, numWords, numBytes, numChars int64
+	numLines, numWords, numBytes, numChars int
 }
 
 func main() {
-	// "usage: %s [OPTION]... FILE...", os.Args[0])
+	// "usage: %s [OPTION]... [FILE]...", os.Args[0])
 
 	options, filenames := parseArgs(os.Args[1:])
 	if len(filenames) == 0 {
@@ -66,26 +66,28 @@ func readBytesFromStdin() []byte {
 
 func printStats(stats Stats, filename string, options map[string]bool) {
 	if len(options) == 0 {
-		fmt.Print(stats.numLines, stats.numWords, stats.numBytes, " ")
+		fmt.Printf(" %d %d %d", stats.numLines, stats.numWords, stats.numBytes)
 	} else {
 		if options["-l"] {
-			fmt.Print(stats.numLines, " ")
+			fmt.Printf(" %d", stats.numLines)
 		}
 
 		if options["-w"] {
-			fmt.Print(stats.numWords, " ")
+			fmt.Printf(" %d", stats.numWords)
 		}
 
 		if options["-m"] {
-			fmt.Print(stats.numChars, " ")
+			fmt.Printf(" %d", stats.numChars)
 		}
 
 		if options["-c"] {
-			fmt.Print(stats.numBytes, " ")
+			fmt.Printf(" %d", stats.numBytes)
 		}
 	}
 
-	fmt.Println(filename)
+	if filename != "" {
+		fmt.Printf(" %s\n", filename)
+	}
 }
 
 func GetStats(filename string) Stats {
@@ -98,15 +100,15 @@ func GetStats(filename string) Stats {
 }
 
 func getStatsFromBytes(bytes []byte) Stats {
-	stats := Stats{0, 0, 0, int64(utf8.RuneCount(bytes))}
+	stats := Stats{0, 0, len(bytes), utf8.RuneCount(bytes)}
 	inWord := false
 
 	for _, b := range bytes {
-		if b == '\n' {
-			stats.numLines++
-		}
-
 		if unicode.IsSpace(rune(b)) {
+			if b == '\n' {
+				stats.numLines++
+			}
+
 			if inWord {
 				stats.numWords++
 			}
@@ -115,8 +117,6 @@ func getStatsFromBytes(bytes []byte) Stats {
 		} else {
 			inWord = true
 		}
-
-		stats.numBytes++
 	}
 
 	if inWord {
