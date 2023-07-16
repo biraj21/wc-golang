@@ -119,5 +119,9 @@ func getStatsFromBytes(bytes []byte) Stats {
 		stats.numBytes++
 	}
 
+	if inWord {
+		stats.numWords++
+	}
+
 	return stats
 }
