@@ -86,8 +86,10 @@ func printStats(stats Stats, filename string, options map[string]bool) {
 	}
 
 	if filename != "" {
-		fmt.Printf(" %s\n", filename)
+		fmt.Printf(" %s", filename)
 	}
+
+	fmt.Println()
 }
 
 func GetStats(filename string) Stats {
